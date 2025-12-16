@@ -1,9 +1,9 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: 'http://YOUR_BACKEND_IP:5000/api', // Replace with your actual backend IP
+  baseURL: 'http://localhost:5000/api', // Replace with your actual backend IP
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,7 +12,7 @@ const api = axios.create({
 // Add request interceptor to add auth token
 api.interceptors.request.use(
   async (config) => {
-    const token = await SecureStore.getItemAsync('authToken');
+    const token = await AsyncStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,18 +30,18 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     
     // If error is 401 and we haven't tried to refresh token yet
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
       try {
-        const refreshToken = await SecureStore.getItemAsync('refreshToken');
+        const refreshToken = await AsyncStorage.getItem('refreshToken');
         const response = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {
           refreshToken
         });
         
         const { token, refreshToken: newRefreshToken } = response.data;
-        await SecureStore.setItemAsync('authToken', token);
-        await SecureStore.setItemAsync('refreshToken', newRefreshToken);
+        await AsyncStorage.setItem('authToken', token);
+        await AsyncStorage.setItem('refreshToken', newRefreshToken);
         
         // Update the Authorization header
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -51,8 +51,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (error) {
         // If refresh token fails, clear storage and redirect to login
-        await SecureStore.deleteItemAsync('authToken');
-        await SecureStore.deleteItemAsync('refreshToken');
+        await AsyncStorage.removeItem('authToken');
+        await AsyncStorage.removeItem('refreshToken');
         // You might want to redirect to login screen here
         return Promise.reject(error);
       }

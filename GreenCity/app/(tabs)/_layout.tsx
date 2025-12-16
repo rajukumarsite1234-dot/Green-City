@@ -1,4 +1,4 @@
-import { useAuth } from "@/Hook/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Tabs } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 export default function TabLayout() {

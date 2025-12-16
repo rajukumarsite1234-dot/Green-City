@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/Hook/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Text, View } from "react-native";
 export default function Profile() {
   const { logout } = useAuth();
