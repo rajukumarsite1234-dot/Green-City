@@ -151,7 +151,7 @@ export const corsOptions = {
       'http://localhost:5174',
       'http://localhost:5175',
       'https://yourdomain.com', // Add your production domain
-      'https://www.yourdomain.com'
+      'http://localhost:8081'
     ];
     
     // Allow requests with no origin (mobile apps, curl, etc.)
